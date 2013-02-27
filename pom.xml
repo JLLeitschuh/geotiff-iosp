@@ -4,7 +4,7 @@
 	<groupId>gov.usgs.cida.netcdf.iosp</groupId>
 	<artifactId>geotiff-iosp-parent</artifactId>
 	<packaging>pom</packaging>
-	<version>1.0-SNAPSHOT</version>
+	<version>1.0</version>
 	<name>GeoTIFF IOSP Parent</name>
 	<organization>
 		<name>USGS/CIDA</name>
@@ -23,7 +23,8 @@
 		<url>https://github.com/USGS-CIDA/geotiff-iosp</url>
 		<connection>scm:git:git@github.com:USGS-CIDA/geotiff-iosp.git</connection>
 		<developerConnection>scm:git:git@github.com:USGS-CIDA/geotiff-iosp.git</developerConnection>
-	</scm>
+	  <tag>geotiff-iosp-1.0</tag>
+  </scm>
     <distributionManagement>
         <repository>
             <id>cida-releases</id>
@@ -142,7 +143,7 @@
 					<configuration>
 						<archive>
 							<manifest>
-								<addDefaultImplementationEntries/>
+								<addDefaultImplementationEntries />
 							</manifest>
 						</archive>
 					</configuration>
