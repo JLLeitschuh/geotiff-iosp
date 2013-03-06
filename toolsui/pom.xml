@@ -43,6 +43,7 @@
                         </goals>
                         <configuration>
                             <finalName>toolsUI-${project.version}</finalName>
+                            <shadedArtifactAttached>true</shadedArtifactAttached>
                             <artifactSet>
                                 <excludes>
                                     <exclude>commons-logging:commons-logging</exclude>
