@@ -201,6 +201,17 @@ public class GeoTiffCoordSys {
         if (projCS == null) {
             return null;
         }
+        // START - QUICK FIX  Maybe refactor this method/class?  It appears it's
+        // premature to expect a GeogCS to be known as it may be a property of 
+        // the Projection and not explicitly defined in the GeoTIFF metadata
+        if (geogCSHandler == null) {
+            GTGeogCS geogCS = projCS.getSourceGeogCS();
+            if (geogCS == null) {
+                return null;
+            }
+            geogCSHandler = new GeogCSGridMappingAdapter(geogCS);
+        }
+        // END - QUICK FIX
         ProjCoordTrans pct = ProjCoordTrans.findByEPSGCode(projCS.getCoordOpMethodCode());
         switch(pct) {
             case CT_AlbersEqualArea:
