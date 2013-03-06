@@ -13,6 +13,7 @@
 	<modules>
 		<module>geotiff-iosp</module>
 		<module>thredds</module>
+		<module>toolsui</module>
 	</modules>
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -62,6 +63,11 @@
 				<version>${thredds.version}</version>
 				<type>pom</type>
 				<scope>import</scope>
+			</dependency>
+			<dependency>
+				<groupId>edu.ucar</groupId>
+				<artifactId>ui</artifactId>
+				<version>${thredds.version}</version>
 			</dependency>
 			<dependency>
 				<groupId>org.slf4j</groupId>
