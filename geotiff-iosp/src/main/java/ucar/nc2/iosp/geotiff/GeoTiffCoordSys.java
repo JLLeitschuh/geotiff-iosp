@@ -4,8 +4,10 @@ import java.util.Arrays;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import javax.imageio.metadata.IIOMetadata;
+import javax.measure.converter.UnitConverter;
 import javax.measure.unit.NonSI;
 import javax.measure.unit.SI;
+import javax.measure.unit.Unit;
 import ucar.ma2.Array;
 import ucar.ma2.DataType;
 import ucar.nc2.Attribute;
@@ -21,6 +23,7 @@ import ucar.nc2.iosp.geotiff.epsg.EPSGFactoryManager;
 import ucar.nc2.iosp.geotiff.epsg.GTGeogCS;
 import ucar.nc2.iosp.geotiff.epsg.GTProjCS;
 import static ucar.nc2.iosp.geotiff.GeoTiffIIOMetadataAdapter.*;
+import ucar.nc2.iosp.geotiff.epsg.GTUnitOfMeasure;
 
 public class GeoTiffCoordSys {
 
@@ -114,20 +117,20 @@ public class GeoTiffCoordSys {
     public final static int EPSGInitialLongitude = 8830;
     public final static int EPSGZoneWidth = 8831;
 
-    private int width;
-    private int height;
+    private final int width;
+    private final int height;
 
     private double[] pixelScales;
     private double[] tiePoints;
     private double[] transformation;
 
-    private int modelType;
-    private int geographicType;
-    private int rasterType;
+    private final int modelType;
+    private final int geographicType;
+    private final int rasterType;
 
     private GridMappingAdapter gridMappingAdapter;
     
-    final private EPSGFactory epsgFactory;
+    private final EPSGFactory epsgFactory;
     
     public GeoTiffCoordSys(IIOMetadata metadata, int width, int height) {
 
@@ -166,6 +169,8 @@ public class GeoTiffCoordSys {
                 if (datum != null) {
                     geogCS = epsgFactory.findGeogCSByDatum(datum);
                 }
+            } else {
+                // TODO: Create GeogCS from components
             }
         }
         return (geogCS == null) ?
@@ -314,159 +319,183 @@ public class GeoTiffCoordSys {
         String gridMappingName = null;
         Map<String, Double> pMap = new LinkedHashMap<String, Double>();
         ProjCoordTrans pct = ProjCoordTrans.findByGeoTIFFCode(projCoordTrans);
+        
         double lat;
         double lon;
+        
         // TODO:  Units Handling!  Assuming meters and degress!
+        UnitConverter linearConverter = createProjLinearUnitConverter(metadata);
+        UnitConverter angularConverter = createGeogAngularUnitConverter(metadata);
+        
         switch(pct) {
             case CT_AlbersEqualArea:
                 gridMappingName = "albers_conical_equal_area";
                 pMap.put("standard_parallel1",
-                        toDouble(metadata.getGeoKey(ProjStdParallel1GeoKey)));
+                        toDouble(metadata.getGeoKey(ProjStdParallel1GeoKey), angularConverter));
                 pMap.put("standard_parallel2",
-                        toDouble(metadata.getGeoKey(ProjStdParallel2GeoKey)));
+                        toDouble(metadata.getGeoKey(ProjStdParallel2GeoKey), angularConverter));
                 pMap.put("latitude_of_projection_origin",
-                        toDouble(metadata.getGeoKey(ProjNatOriginLatGeoKey)));
+                        toDouble(metadata.getGeoKey(ProjNatOriginLatGeoKey), angularConverter));
                 pMap.put("longitude_of_central_meridian",
-                        toDouble(metadata.getGeoKey(ProjNatOriginLongGeoKey)));
+                        toDouble(metadata.getGeoKey(ProjNatOriginLongGeoKey), angularConverter));
                 pMap.put("false_easting",
-                        toDouble(metadata.getGeoKey(ProjFalseEastingGeoKey)));
+                        toDouble(metadata.getGeoKey(ProjFalseEastingGeoKey), linearConverter));
                 pMap.put("false_northing",
-                        toDouble(metadata.getGeoKey(ProjFalseNorthingGeoKey)));
+                        toDouble(metadata.getGeoKey(ProjFalseNorthingGeoKey), linearConverter));
                 break;
             case CT_AzimuthalEquidistant:
                 gridMappingName = "azimuthal_equidistant";
-                pMap.put("latitude_of_projection_origin",
-                        toDouble(metadata.getGeoKey(ProjCenterLatGeoKey)));
-                pMap.put("longitude_of_projection_origin",
-                        toDouble(metadata.getGeoKey(ProjCenterLongGeoKey)));
+                // libgeotiff source and docs say to use ProjCenter but Intergraph
+                // samples use ProjNat, eh...
+                lat = toDouble(metadata.getGeoKey(ProjCenterLatGeoKey), angularConverter);
+                if (Double.isNaN(lat)) {
+                    lat = toDouble(metadata.getGeoKey(ProjNatOriginLatGeoKey), angularConverter);
+                }
+                lon = toDouble(metadata.getGeoKey(ProjCenterLongGeoKey), angularConverter);
+                if (Double.isNaN(lon)) {
+                    lon = toDouble(metadata.getGeoKey(ProjNatOriginLongGeoKey), angularConverter);
+                }
+                pMap.put("latitude_of_projection_origin", lat);
+                pMap.put("longitude_of_projection_origin", lon);
                 pMap.put("false_easting",
-                        toDouble(metadata.getGeoKey(ProjFalseEastingGeoKey)));
+                        toDouble(metadata.getGeoKey(ProjFalseEastingGeoKey), linearConverter));
                 pMap.put("false_northing",
-                        toDouble(metadata.getGeoKey(ProjFalseNorthingGeoKey)));
+                        toDouble(metadata.getGeoKey(ProjFalseNorthingGeoKey), linearConverter));
                 break;
             case CT_LambertAzimEqualArea:
                 gridMappingName = "lambert_azimuthal_equal_area";
                 // libgeotiff source and docs say to use ProjCenter but Intergraph
                 // samples use ProjNat, eh...
-                lat = toDouble(metadata.getGeoKey(ProjCenterLatGeoKey));
+                lat = toDouble(metadata.getGeoKey(ProjCenterLatGeoKey), angularConverter);
                 if (Double.isNaN(lat)) {
-                    lat = toDouble(metadata.getGeoKey(ProjNatOriginLatGeoKey));
+                    lat = toDouble(metadata.getGeoKey(ProjNatOriginLatGeoKey), angularConverter);
                 }
-                lon = toDouble(metadata.getGeoKey(ProjCenterLongGeoKey));
+                lon = toDouble(metadata.getGeoKey(ProjCenterLongGeoKey), angularConverter);
                 if (Double.isNaN(lon)) {
-                    lon = toDouble(metadata.getGeoKey(ProjNatOriginLongGeoKey));
+                    lon = toDouble(metadata.getGeoKey(ProjNatOriginLongGeoKey), angularConverter);
                 }
                 pMap.put("latitude_of_projection_origin", lat);
                 pMap.put("longitude_of_projection_origin", lon);
                 pMap.put("false_easting",
-                        toDouble(metadata.getGeoKey(ProjFalseEastingGeoKey)));
+                        toDouble(metadata.getGeoKey(ProjFalseEastingGeoKey), linearConverter));
                 pMap.put("false_northing",
-                        toDouble(metadata.getGeoKey(ProjFalseNorthingGeoKey)));
+                        toDouble(metadata.getGeoKey(ProjFalseNorthingGeoKey), linearConverter));
                 break;
             case CT_LambertConfConic_2SP:
                 gridMappingName = "lambert_conformal_conic";
                 // libgeotiff source and docs say to use ProjFalseOrigin but
                 // Intergraph samples use ProjNat, eh...
-                lat = toDouble(metadata.getGeoKey(ProjFalseOriginLatGeoKey));
+                lat = toDouble(metadata.getGeoKey(ProjFalseOriginLatGeoKey), angularConverter);
                 if (Double.isNaN(lat)) {
-                    lat = toDouble(metadata.getGeoKey(ProjNatOriginLatGeoKey));
+                    lat = toDouble(metadata.getGeoKey(ProjNatOriginLatGeoKey), angularConverter);
                 }
-                lon = toDouble(metadata.getGeoKey(ProjFalseOriginLongGeoKey));
+                lon = toDouble(metadata.getGeoKey(ProjFalseOriginLongGeoKey), angularConverter);
                 if (Double.isNaN(lon)) {
-                    lon = toDouble(metadata.getGeoKey(ProjNatOriginLongGeoKey));
+                    lon = toDouble(metadata.getGeoKey(ProjNatOriginLongGeoKey), angularConverter);
                 }
                 pMap.put("latitude_of_projection_origin", lat);
                 pMap.put("longitude_of_central_meridian", lon);
                 pMap.put("standard_parallel1",
-                        toDouble(metadata.getGeoKey(ProjStdParallel1GeoKey)));
+                        toDouble(metadata.getGeoKey(ProjStdParallel1GeoKey), angularConverter));
                 pMap.put("standard_parallel2",
-                        toDouble(metadata.getGeoKey(ProjStdParallel2GeoKey)));
+                        toDouble(metadata.getGeoKey(ProjStdParallel2GeoKey), angularConverter));
                 pMap.put("false_easting",
-                        toDouble(metadata.getGeoKey(ProjFalseOriginEastingGeoKey)));
+                        toDouble(metadata.getGeoKey(ProjFalseOriginEastingGeoKey), linearConverter));
                 pMap.put("false_northing",
-                        toDouble(metadata.getGeoKey(ProjFalseOriginNorthingGeoKey)));
+                        toDouble(metadata.getGeoKey(ProjFalseOriginNorthingGeoKey), linearConverter));
                 break;
             case CT_CylindricalEqualArea:
                 gridMappingName = "lambert_cylindrical_equal_area";
                 pMap.put("longitude_of_central_meridian",
-                        toDouble(metadata.getGeoKey(ProjNatOriginLongGeoKey)));
+                        toDouble(metadata.getGeoKey(ProjNatOriginLongGeoKey), angularConverter));
                 pMap.put("standard_parallel",
-                        toDouble(metadata.getGeoKey(ProjStdParallel1GeoKey)));
+                        toDouble(metadata.getGeoKey(ProjStdParallel1GeoKey), angularConverter));
                 pMap.put("false_easting",
-                        toDouble(metadata.getGeoKey(ProjFalseEastingGeoKey)));
+                        toDouble(metadata.getGeoKey(ProjFalseEastingGeoKey), linearConverter));
                 pMap.put("false_northing",
-                        toDouble(metadata.getGeoKey(ProjFalseNorthingGeoKey)));
+                        toDouble(metadata.getGeoKey(ProjFalseNorthingGeoKey), linearConverter));
                 break;
             case CT_Mercator:
                 gridMappingName = "mercator";
+                // NOTE: This first parameter is ignored by NetCDF-Java (last tested against 4.3.15)
+                pMap.put("longitude_of_central_meridian",
+                        toDouble(metadata.getGeoKey(ProjNatOriginLatGeoKey), angularConverter));
                 pMap.put("longitude_of_projection_origin",
-                        toDouble(metadata.getGeoKey(ProjNatOriginLongGeoKey)));
+                        toDouble(metadata.getGeoKey(ProjNatOriginLongGeoKey), angularConverter));
                 pMap.put("standard_parallel",
-                        toDouble(metadata.getGeoKey(ProjStdParallel1GeoKey)));
+                        toDouble(metadata.getGeoKey(ProjStdParallel1GeoKey), angularConverter));
                 pMap.put("scale_factor_at_projection_origin",
                         toDouble(metadata.getGeoKey(ProjScaleAtNatOriginGeoKey)));
                 pMap.put("false_easting",
-                        toDouble(metadata.getGeoKey(ProjFalseEastingGeoKey)));
+                        toDouble(metadata.getGeoKey(ProjFalseEastingGeoKey), linearConverter));
                 pMap.put("false_northing",
-                        toDouble(metadata.getGeoKey(ProjFalseNorthingGeoKey)));
+                        toDouble(metadata.getGeoKey(ProjFalseNorthingGeoKey), linearConverter));
                 break;
             case CT_Orthographic:
                 gridMappingName = "orthographic";
                 // libgeotiff source and docs say to use ProjCenter but
                 // Intergraph samples use ProjNat, eh...
-                lat = toDouble(metadata.getGeoKey(ProjCenterLatGeoKey));
+                lat = toDouble(metadata.getGeoKey(ProjCenterLatGeoKey), angularConverter);
                 if (Double.isNaN(lat)) {
-                    lat = toDouble(metadata.getGeoKey(ProjNatOriginLatGeoKey));
+                    lat = toDouble(metadata.getGeoKey(ProjNatOriginLatGeoKey), angularConverter);
                 }
-                lon = toDouble(metadata.getGeoKey(ProjCenterLongGeoKey));
+                lon = toDouble(metadata.getGeoKey(ProjCenterLongGeoKey), angularConverter);
                 if (Double.isNaN(lon)) {
-                    lon = toDouble(metadata.getGeoKey(ProjNatOriginLongGeoKey));
+                    lon = toDouble(metadata.getGeoKey(ProjNatOriginLongGeoKey), angularConverter);
                 }
                 pMap.put("latitude_of_projection_origin", lat);
                 pMap.put("longitude_of_projection_origin", lon);
                 pMap.put("false_easting",
-                        toDouble(metadata.getGeoKey(ProjFalseEastingGeoKey)));
+                        toDouble(metadata.getGeoKey(ProjFalseEastingGeoKey), linearConverter));
                 pMap.put("false_northing",
-                        toDouble(metadata.getGeoKey(ProjFalseNorthingGeoKey)));
+                        toDouble(metadata.getGeoKey(ProjFalseNorthingGeoKey), linearConverter));
                 break;
             case CT_PolarStereographic:
                 gridMappingName = "polar_stereographic";
                 pMap.put("latitude_of_projection_origin",
-                        toDouble(metadata.getGeoKey(ProjNatOriginLatGeoKey)));
+                        toDouble(metadata.getGeoKey(ProjNatOriginLatGeoKey), angularConverter));
                 pMap.put("straight_vertical_longitude_from_pole",
-                        toDouble(metadata.getGeoKey(ProjStraightVertPoleLongGeoKey)));
+                        toDouble(metadata.getGeoKey(ProjStraightVertPoleLongGeoKey), angularConverter));
                 pMap.put("scale_factor_at_projection_origin",
                         toDouble(metadata.getGeoKey(ProjScaleAtNatOriginGeoKey)));
                 pMap.put("false_easting",
-                        toDouble(metadata.getGeoKey(ProjFalseEastingGeoKey)));
+                        toDouble(metadata.getGeoKey(ProjFalseEastingGeoKey), linearConverter));
                 pMap.put("false_northing",
-                        toDouble(metadata.getGeoKey(ProjFalseNorthingGeoKey)));
+                        toDouble(metadata.getGeoKey(ProjFalseNorthingGeoKey), linearConverter));
                 break;
             case CT_Stereographic:
                 gridMappingName = "stereographic";
-                pMap.put("latitude_of_projection_origin",
-                        toDouble(metadata.getGeoKey(ProjCenterLatGeoKey)));
-                pMap.put("longitude_of_projection_origin",
-                        toDouble(metadata.getGeoKey(ProjCenterLongGeoKey)));
+                // libgeotiff source and docs say to use ProjCenter but
+                // Intergraph samples use ProjNat, eh...
+                lat = toDouble(metadata.getGeoKey(ProjCenterLatGeoKey), angularConverter);
+                if (Double.isNaN(lat)) {
+                    lat = toDouble(metadata.getGeoKey(ProjNatOriginLatGeoKey), angularConverter);
+                }
+                lon = toDouble(metadata.getGeoKey(ProjCenterLongGeoKey), angularConverter);
+                if (Double.isNaN(lon)) {
+                    lon = toDouble(metadata.getGeoKey(ProjNatOriginLongGeoKey), angularConverter);
+                }
+                pMap.put("latitude_of_projection_origin", lat);
+                pMap.put("longitude_of_projection_origin", lon);
                 pMap.put("scale_factor_at_projection_origin",
                         toDouble(metadata.getGeoKey(ProjScaleAtNatOriginGeoKey)));
                 pMap.put("false_easting",
-                        toDouble(metadata.getGeoKey(ProjFalseEastingGeoKey)));
+                        toDouble(metadata.getGeoKey(ProjFalseEastingGeoKey), linearConverter));
                 pMap.put("false_northing",
-                        toDouble(metadata.getGeoKey(ProjFalseNorthingGeoKey)));
+                        toDouble(metadata.getGeoKey(ProjFalseNorthingGeoKey), linearConverter));
                 break;
             case CT_TransverseMercator:
                 gridMappingName = "transverse_mercator";
                 pMap.put("latitude_of_projection_origin",
-                        toDouble(metadata.getGeoKey(ProjNatOriginLatGeoKey)));
+                        toDouble(metadata.getGeoKey(ProjNatOriginLatGeoKey), angularConverter));
                 pMap.put("longitude_of_central_meridian",
-                        toDouble(metadata.getGeoKey(ProjNatOriginLongGeoKey)));
+                        toDouble(metadata.getGeoKey(ProjNatOriginLongGeoKey), angularConverter));
                 pMap.put("scale_factor_at_central_meridian",
                         toDouble(metadata.getGeoKey(ProjScaleAtNatOriginGeoKey)));
                 pMap.put("false_easting",
-                        toDouble(metadata.getGeoKey(ProjFalseEastingGeoKey)));
+                        toDouble(metadata.getGeoKey(ProjFalseEastingGeoKey), linearConverter));
                 pMap.put("false_northing",
-                        toDouble(metadata.getGeoKey(ProjFalseNorthingGeoKey)));
+                        toDouble(metadata.getGeoKey(ProjFalseNorthingGeoKey), linearConverter));
                 break;
             default:
         }
@@ -489,6 +518,30 @@ public class GeoTiffCoordSys {
     public CoordSysAdapter getCoordSysAdapter() {
         return new CoordSysAdapter();
     }
+    
+    private UnitConverter createGeogAngularUnitConverter(GeoTiffIIOMetadataAdapter metadata) {
+        return createUnitConverter(metadata, GeogAngularUnitsGeoKey, NonSI.DEGREE_ANGLE);
+    }
+
+    private UnitConverter createGeogAzimuthUnitConverter(GeoTiffIIOMetadataAdapter metadata) {
+        return createUnitConverter(metadata, GeogAzimuthUnitsGeoKey, NonSI.DEGREE_ANGLE);
+    }
+    
+    private UnitConverter createProjLinearUnitConverter(GeoTiffIIOMetadataAdapter metadata) {
+        return createUnitConverter(metadata, ProjLinearUnitsGeoKey, SI.METRE);
+    }
+    
+    private UnitConverter createUnitConverter(GeoTiffIIOMetadataAdapter metadata, int geoKey, Unit to) {
+        int linearUnitCode = toInt(metadata.getGeoKey(geoKey));
+        if (linearUnitCode != Integer.MIN_VALUE) {
+            GTUnitOfMeasure unitOfMeasure = epsgFactory.findUnitOfMeasureByCode(linearUnitCode);
+            if (unitOfMeasure != null) {
+                return unitOfMeasure.getUnit().getConverterTo(to);
+            }
+        }
+        // TODO: log
+        return UnitConverter.IDENTITY;
+    }
 
     private static int toInt(String string) {
         if (string != null && string.length() > 0) {
@@ -510,6 +563,11 @@ public class GeoTiffCoordSys {
             }
         }
         return Double.NaN;
+    }
+    
+    private static double toDouble(String string, UnitConverter converter) {
+        double value = toDouble(string);
+        return value == value ? converter.convert(value) : value;
     }
 
     @Override
