@@ -77,7 +77,14 @@ public class UnitOfMeasureEntry implements CSVEntry, GTUnitOfMeasure {
         return CSVEPSGFactory.getInstance().findUnitOfMeasureByCode(targetUnitOfMeasureCode);
     }
     
-    public double convertToTargetUnitOfMeasure(double value) {
-        return getUnit().getConverterTo(getTargetUnitOfMeasure().getUnit()).convert(value);
+    public double convert(double value) {
+        return convert(value, null);
+    }
+    
+    public double convert(double value, Unit targetUnit) {
+        if (targetUnit == null) {
+            targetUnit = getTargetUnitOfMeasure().getUnit();
+        }
+        return getUnit().getConverterTo(targetUnit).convert(value);
     }
 }

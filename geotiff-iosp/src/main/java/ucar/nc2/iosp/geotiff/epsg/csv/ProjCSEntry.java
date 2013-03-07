@@ -1,5 +1,6 @@
 package ucar.nc2.iosp.geotiff.epsg.csv;
 
+import javax.measure.unit.Unit;
 import ucar.nc2.iosp.geotiff.epsg.GTGeogCS;
 import ucar.nc2.iosp.geotiff.epsg.GTProjCS;
 import ucar.nc2.iosp.geotiff.epsg.GTUnitOfMeasure;
@@ -316,7 +317,7 @@ public class ProjCSEntry implements CSVEntry, GTProjCS {
 
     @Override
     public synchronized UnitOfMeasureEntry getParameter2UnitOfMeasure() {
-        if (parameter2UnitOfMeasure == null && parameter4UnitOfMeasureCode != MISSING_CODE) {
+        if (parameter2UnitOfMeasure == null && parameter2UnitOfMeasureCode != MISSING_CODE) {
             parameter2UnitOfMeasure = CSVEPSGFactory.getInstance().findUnitOfMeasureByCode(parameter2UnitOfMeasureCode);
         }
         return parameter2UnitOfMeasure;
@@ -361,30 +362,34 @@ public class ProjCSEntry implements CSVEntry, GTProjCS {
         }
         return parameter7UnitOfMeasure;
     }
-
     @Override
     public double getParameterValueByCode(int parameterCode) {
+        return getParameterValueByCode(parameterCode, null);
+    }
+    
+    @Override
+    public double getParameterValueByCode(int parameterCode, Unit unit) {
         // so lame
         if (parameter1Code == parameterCode && parameter1Code != MISSING_CODE) {
-            return getParameter1UnitOfMeasure().convertToTargetUnitOfMeasure(parameter1Value);
+            return getParameter1UnitOfMeasure().convert(parameter1Value, unit);
         }
         if (parameter2Code == parameterCode && parameter2Code != MISSING_CODE) {
-            return getParameter2UnitOfMeasure().convertToTargetUnitOfMeasure(parameter2Value);
+            return getParameter2UnitOfMeasure().convert(parameter2Value, unit);
         }
         if (parameter3Code == parameterCode && parameter3Code != MISSING_CODE) {
-            return getParameter3UnitOfMeasure().convertToTargetUnitOfMeasure(parameter3Value);
+            return getParameter3UnitOfMeasure().convert(parameter3Value, unit);
         }
         if (parameter4Code == parameterCode && parameter4Code != MISSING_CODE) {
-            return getParameter4UnitOfMeasure().convertToTargetUnitOfMeasure(parameter4Value);
+            return getParameter4UnitOfMeasure().convert(parameter4Value, unit);
         }
         if (parameter5Code == parameterCode && parameter5Code != MISSING_CODE) {
-            return getParameter5UnitOfMeasure().convertToTargetUnitOfMeasure(parameter5Value);
+            return getParameter5UnitOfMeasure().convert(parameter5Value, unit);
         }
         if (parameter6Code == parameterCode && parameter6Code != MISSING_CODE) {
-            return getParameter6UnitOfMeasure().convertToTargetUnitOfMeasure(parameter6Value);
+            return getParameter6UnitOfMeasure().convert(parameter6Value, unit);
         }
         if (parameter7Code == parameterCode && parameter7Code != MISSING_CODE) {
-            return getParameter7UnitOfMeasure().convertToTargetUnitOfMeasure(parameter7Value);
+            return getParameter7UnitOfMeasure().convert(parameter7Value, unit);
         }
         return MISSING_VALUE;
     }
