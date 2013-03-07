@@ -1,11 +1,15 @@
 package ucar.nc2.iosp.geotiff.cs;
 
+import javax.measure.converter.UnitConverter;
+import javax.measure.unit.NonSI;
+import javax.measure.unit.SI;
 import ucar.ma2.DataType;
 import ucar.nc2.Attribute;
 import ucar.nc2.NetcdfFile;
 import ucar.nc2.Variable;
 import ucar.nc2.iosp.geotiff.epsg.GTEllipsoid;
 import ucar.nc2.iosp.geotiff.epsg.GTGeogCS;
+import ucar.nc2.iosp.geotiff.epsg.GTPrimeMeridian;
 
 public class GeogCSGridMappingAdapter implements GridMappingAdapter {
 
@@ -35,19 +39,25 @@ public class GeogCSGridMappingAdapter implements GridMappingAdapter {
 
     public void augmentCRSVariable(Variable variable) {
         
-        variable.addAttribute(new Attribute("longitude_of_prime_meridian", geogCS.getPrimeMeridian().getLongitude()));
-
+        GTPrimeMeridian meridian = geogCS.getPrimeMeridian();
         GTEllipsoid ellipsoid = geogCS.getEllipsoid();
+        
+        UnitConverter meridianConverter = meridian.getUnitOfMeasure().getUnit().getConverterTo(NonSI.DEGREE_ANGLE);
+        UnitConverter ellipsoidConverter = ellipsoid.getUnitOfMeasure().getUnit().getConverterTo(SI.METRE);
+        
+        variable.addAttribute(new Attribute("longitude_of_prime_meridian", meridianConverter.convert(meridian.getLongitude())));
+
         double semiMajor = ellipsoid.getSemiMajorAxis();
         double semiMinor = ellipsoid.getSemiMinorAxis();
         double inverse = ellipsoid.getInverseFlattening();
         if (!Double.isNaN(semiMajor)) {
-            variable.addAttribute(new Attribute("semi_major_axis", semiMajor));
+            variable.addAttribute(new Attribute("semi_major_axis", ellipsoidConverter.convert(semiMajor)));
         }
         if (!Double.isNaN(semiMinor)) {
-            variable.addAttribute(new Attribute("semi_minor_axis", semiMinor));
+            variable.addAttribute(new Attribute("semi_minor_axis", ellipsoidConverter.convert(semiMinor)));
         }
         if (!Double.isNaN(inverse)) {
+            // no conversion! inverse flattening is unit-less!
             variable.addAttribute(new Attribute("inverse_flattening", inverse));
         }
     }

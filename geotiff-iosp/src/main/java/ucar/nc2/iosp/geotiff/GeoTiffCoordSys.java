@@ -4,6 +4,8 @@ import java.util.Arrays;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import javax.imageio.metadata.IIOMetadata;
+import javax.measure.unit.NonSI;
+import javax.measure.unit.SI;
 import ucar.ma2.Array;
 import ucar.ma2.DataType;
 import ucar.nc2.Attribute;
@@ -217,84 +219,84 @@ public class GeoTiffCoordSys {
             case CT_AlbersEqualArea:
                 gridMappingName = "albers_conical_equal_area";
                 pMap.put("standard_parallel1",
-                        projCS.getParameterValueByCode(EPSGStdParallel1Lat));
+                        projCS.getParameterValueByCode(EPSGStdParallel1Lat, NonSI.DEGREE_ANGLE));
                 pMap.put("standard_parallel2",
-                        projCS.getParameterValueByCode(EPSGStdParallel2Lat));
+                        projCS.getParameterValueByCode(EPSGStdParallel2Lat, NonSI.DEGREE_ANGLE));
                 pMap.put("latitude_of_projection_origin",
-                        projCS.getParameterValueByCode(EPSGFalseOriginLat));
+                        projCS.getParameterValueByCode(EPSGFalseOriginLat, NonSI.DEGREE_ANGLE));
                 pMap.put("longitude_of_central_meridian",
-                        projCS.getParameterValueByCode(EPSGFalseOriginLong));
+                        projCS.getParameterValueByCode(EPSGFalseOriginLong, NonSI.DEGREE_ANGLE));
                 pMap.put("false_easting",
-                        projCS.getParameterValueByCode(EPSGFalseOriginEasting));
+                        projCS.getParameterValueByCode(EPSGFalseOriginEasting, SI.METRE));
                 pMap.put("false_northing",
-                        projCS.getParameterValueByCode(EPSGFalseOriginNorthing));
+                        projCS.getParameterValueByCode(EPSGFalseOriginNorthing, SI.METRE));
                 break;
             case CT_LambertAzimEqualArea:
                 gridMappingName = "lambert_azimuthal_equal_area";
                 pMap.put("latitude_of_projection_origin",
-                        projCS.getParameterValueByCode(EPSGNatOriginLat));
+                        projCS.getParameterValueByCode(EPSGNatOriginLat, NonSI.DEGREE_ANGLE));
                 pMap.put("longitude_of_projection_origin",
-                        projCS.getParameterValueByCode(EPSGNatOriginLong));
+                        projCS.getParameterValueByCode(EPSGNatOriginLong, NonSI.DEGREE_ANGLE));
                 pMap.put("false_easting",
-                        projCS.getParameterValueByCode(EPSGFalseEasting));
+                        projCS.getParameterValueByCode(EPSGFalseEasting, SI.METRE));
                 pMap.put("false_northing",
-                        projCS.getParameterValueByCode(EPSGFalseNorthing));
+                        projCS.getParameterValueByCode(EPSGFalseNorthing, SI.METRE));
                 break;
             case CT_LambertConfConic_2SP:
                 gridMappingName = "lambert_conformal_conic";
                 pMap.put("latitude_of_projection_origin",
-                        projCS.getParameterValueByCode(EPSGFalseOriginLat));
+                        projCS.getParameterValueByCode(EPSGFalseOriginLat, NonSI.DEGREE_ANGLE));
                 pMap.put("longitude_of_central_meridian",
-                        projCS.getParameterValueByCode(EPSGFalseOriginLong));
+                        projCS.getParameterValueByCode(EPSGFalseOriginLong, NonSI.DEGREE_ANGLE));
                 pMap.put("standard_parallel1",
-                        projCS.getParameterValueByCode(EPSGStdParallel1Lat));
+                        projCS.getParameterValueByCode(EPSGStdParallel1Lat, NonSI.DEGREE_ANGLE));
                 pMap.put("standard_parallel2",
-                        projCS.getParameterValueByCode(EPSGStdParallel2Lat));
+                        projCS.getParameterValueByCode(EPSGStdParallel2Lat, NonSI.DEGREE_ANGLE));
                 pMap.put("false_easting",
-                        projCS.getParameterValueByCode(EPSGFalseOriginEasting));
+                        projCS.getParameterValueByCode(EPSGFalseOriginEasting, SI.METRE));
                 pMap.put("false_northing",
-                        projCS.getParameterValueByCode(EPSGFalseOriginNorthing));
+                        projCS.getParameterValueByCode(EPSGFalseOriginNorthing, SI.METRE));
                 break;
             case CT_Mercator:
                 gridMappingName = "mercator";
                 pMap.put("latitude_of_projection_origin",
-                        projCS.getParameterValueByCode(EPSGNatOriginLat));
+                        projCS.getParameterValueByCode(EPSGNatOriginLat, NonSI.DEGREE_ANGLE));
                 pMap.put("longitude_of_projection_origin",
-                        projCS.getParameterValueByCode(EPSGNatOriginLong));
+                        projCS.getParameterValueByCode(EPSGNatOriginLong, NonSI.DEGREE_ANGLE));
                 pMap.put("scale_factor_at_projection_origin",
                         projCS.getParameterValueByCode(EPSGNatOriginScaleFactor));
                 pMap.put("standard_parallel",
-                        projCS.getParameterValueByCode(EPSGStdParallel1Lat));
+                        projCS.getParameterValueByCode(EPSGStdParallel1Lat, NonSI.DEGREE_ANGLE));
                 pMap.put("false_easting",
-                        projCS.getParameterValueByCode(EPSGFalseEasting));
+                        projCS.getParameterValueByCode(EPSGFalseEasting, SI.METRE));
                 pMap.put("false_northing",
-                        projCS.getParameterValueByCode(EPSGFalseNorthing));
+                        projCS.getParameterValueByCode(EPSGFalseNorthing, SI.METRE));
                 break;
             case CT_PolarStereographic:
                 gridMappingName = "polar_stereographic";
                 pMap.put("latitude_of_projection_origin",
-                        projCS.getParameterValueByCode(EPSGNatOriginLat));
+                        projCS.getParameterValueByCode(EPSGNatOriginLat, NonSI.DEGREE_ANGLE));
                 pMap.put("straight_vertical_longitude_from_pole",
-                        projCS.getParameterValueByCode(EPSGNatOriginLong));
+                        projCS.getParameterValueByCode(EPSGNatOriginLong, NonSI.DEGREE_ANGLE));
                 pMap.put("scale_factor_at_projection_origin",
                         projCS.getParameterValueByCode(EPSGNatOriginScaleFactor));
                 pMap.put("false_easting",
-                        projCS.getParameterValueByCode(EPSGFalseEasting));
+                        projCS.getParameterValueByCode(EPSGFalseEasting, SI.METRE));
                 pMap.put("false_northing",
-                        projCS.getParameterValueByCode(EPSGFalseNorthing));
+                        projCS.getParameterValueByCode(EPSGFalseNorthing, SI.METRE));
                 break;
             case CT_TransverseMercator:
                 gridMappingName = "transverse_mercator";
                 pMap.put("latitude_of_projection_origin",
-                        projCS.getParameterValueByCode(EPSGNatOriginLat));
+                        projCS.getParameterValueByCode(EPSGNatOriginLat, NonSI.DEGREE_ANGLE));
                 pMap.put("longitude_of_central_meridian",
-                        projCS.getParameterValueByCode(EPSGNatOriginLong));
+                        projCS.getParameterValueByCode(EPSGNatOriginLong, NonSI.DEGREE_ANGLE));
                 pMap.put("scale_factor_at_central_meridian",
                         projCS.getParameterValueByCode(EPSGNatOriginScaleFactor));
                 pMap.put("false_easting",
-                        projCS.getParameterValueByCode(EPSGFalseEasting));
+                        projCS.getParameterValueByCode(EPSGFalseEasting, SI.METRE));
                 pMap.put("false_northing",
-                        projCS.getParameterValueByCode(EPSGFalseNorthing));
+                        projCS.getParameterValueByCode(EPSGFalseNorthing, SI.METRE));
                 break;
             default:
         }
@@ -314,6 +316,7 @@ public class GeoTiffCoordSys {
         ProjCoordTrans pct = ProjCoordTrans.findByGeoTIFFCode(projCoordTrans);
         double lat;
         double lon;
+        // TODO:  Units Handling!  Assuming meters and degress!
         switch(pct) {
             case CT_AlbersEqualArea:
                 gridMappingName = "albers_conical_equal_area";

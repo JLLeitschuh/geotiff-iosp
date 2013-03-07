@@ -1,5 +1,7 @@
 package ucar.nc2.iosp.geotiff.epsg;
 
+import javax.measure.unit.Unit;
+
 /**
  *
  * @author tkunicki
@@ -50,5 +52,6 @@ public interface GTProjCS {
     public double getParameter7Value();
 
     public double getParameterValueByCode(int code);
+    public double getParameterValueByCode(int code, Unit unit);
 
 }
