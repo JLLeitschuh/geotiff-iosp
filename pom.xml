@@ -44,6 +44,10 @@
             <id>unidata-releases</id>
             <url>https://artifacts.unidata.ucar.edu/content/repositories/unidata-releases</url>
         </repository>
+        <repository>
+            <id>unidata-snapshots</id>
+            <url>https://artifacts.unidata.ucar.edu/content/repositories/unidata-snapshots</url>
+        </repository>
         <!-- for ImageIO-EXT -->
         <repository>
             <id>geosolutions</id>
