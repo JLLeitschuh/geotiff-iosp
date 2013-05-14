@@ -17,7 +17,7 @@
 	</modules>
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-		<thredds.version>4.3.15</thredds.version>
+		<thredds.version>4.3.16</thredds.version>
 		<!--<geotools.version>8.5</geotools.version>-->
 	</properties>
 	<scm>
@@ -43,6 +43,10 @@
         <repository>
             <id>unidata-releases</id>
             <url>https://artifacts.unidata.ucar.edu/content/repositories/unidata-releases</url>
+        </repository>
+        <repository>
+            <id>unidata-snapshots</id>
+            <url>https://artifacts.unidata.ucar.edu/content/repositories/unidata-snapshots</url>
         </repository>
         <!-- for ImageIO-EXT -->
         <repository>
@@ -98,10 +102,17 @@
 				<scope>runtime</scope>
 			</dependency>
 			<dependency>
-				<groupId>javax.measure</groupId>
+                <groupId>net.java.dev.jsr-275</groupId>
+                <artifactId>jsr-275</artifactId>
+                <version>1.0-beta-2</version>
+			</dependency>
+<!-- bah, need former for consistency with GeoTools 2.7.x
+            <dependency>
+                <groupId>javax.measure</groupId>
 				<artifactId>jsr-275</artifactId>
 				<version>0.9.3</version>
 			</dependency>
+-->
 <!--		
 			<dependency>
 				<groupId>org.geotools</groupId>

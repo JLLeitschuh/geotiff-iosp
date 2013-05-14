@@ -93,7 +93,7 @@ public class UnitOfMeasureUtil {
             return (((deg * 100 + min) * 100 + sec) + value) / divisor;
         }
 
-        @Override
+        //@Override // JSR-275 API version issue 
         public BigDecimal convert(BigDecimal bd, MathContext mc) throws ArithmeticException {
             return BigDecimal.valueOf(convert(bd.doubleValue()));
         }
@@ -102,7 +102,7 @@ public class UnitOfMeasureUtil {
             return 1;
         }
 
-        //@Override
+        //@Override // JSR-275 API version issue 
         public boolean isLinear() {
             return true;
         }
@@ -182,7 +182,7 @@ public class UnitOfMeasureUtil {
             return value;
         }
 
-        @Override
+        //@Override // JSR-275 API version issue 
         public BigDecimal convert(BigDecimal bd, MathContext mc) throws ArithmeticException {
             return BigDecimal.valueOf(convert(bd.doubleValue()));
         }

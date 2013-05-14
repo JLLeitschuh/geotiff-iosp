@@ -31,9 +31,15 @@
             <artifactId>jai_core</artifactId>
         </dependency>
         <dependency>
-            <groupId>javax.measure</groupId>
+            <groupId>net.java.dev.jsr-275</groupId>
             <artifactId>jsr-275</artifactId>
         </dependency>
+<!-- bah, need former for consistency with GeoTools 2.7.x
+            <dependency>
+                <groupId>javax.measure</groupId>
+				<artifactId>jsr-275</artifactId>
+			</dependency>
+-->
         <dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-simple</artifactId>
