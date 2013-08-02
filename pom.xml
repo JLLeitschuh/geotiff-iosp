@@ -26,6 +26,10 @@
 		<developerConnection>scm:git:git@github.com:USGS-CIDA/geotiff-iosp.git</developerConnection>
 		<tag>HEAD</tag>
 	</scm>
+	<ciManagement>
+		<system>Hudson</system>
+		<url>http://igsarm-cida-hudson1.er.usgs.gov:8080/hudson/job/geotiff-iosp/</url>
+	</ciManagement>
 	<distributionManagement>
 		<repository>
 			<id>cida-releases</id>
