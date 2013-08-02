@@ -24,41 +24,45 @@
 		<url>https://github.com/USGS-CIDA/geotiff-iosp</url>
 		<connection>scm:git:git@github.com:USGS-CIDA/geotiff-iosp.git</connection>
 		<developerConnection>scm:git:git@github.com:USGS-CIDA/geotiff-iosp.git</developerConnection>
-	  <tag>HEAD</tag>
-  </scm>
-    <distributionManagement>
-        <repository>
-            <id>cida-releases</id>
-            <name>CIDA Releases</name>
-            <url>http://internal.cida.usgs.gov/maven/content/repositories/cida-releases</url>
-        </repository>
-        <snapshotRepository>
-            <id>cida-snapshots</id>
-            <name>CIDA Snapshots</name>
-            <url>http://internal.cida.usgs.gov/maven/content/repositories/cida-snapshots</url>
-        </snapshotRepository>
-    </distributionManagement>
-    <repositories>
-        <!-- for NetCDF -->
-        <repository>
-            <id>unidata-releases</id>
-            <url>https://artifacts.unidata.ucar.edu/content/repositories/unidata-releases</url>
-        </repository>
-        <repository>
-            <id>unidata-snapshots</id>
-            <url>https://artifacts.unidata.ucar.edu/content/repositories/unidata-snapshots</url>
-        </repository>
-        <!-- for ImageIO-EXT -->
-        <repository>
-            <id>geosolutions</id>
-            <url>http://maven.geo-solutions.it</url>
-        </repository>
-        <!-- for JAI and JAI ImageIO (latter is superceded by ImageIO-Ext) -->
-        <repository>
-            <id>opengeo</id>
-            <url>http://download.osgeo.org/webdav/geotools</url>
-        </repository>
-    </repositories>
+		<tag>HEAD</tag>
+	</scm>
+	<ciManagement>
+		<system>Hudson</system>
+		<url>http://igsarm-cida-hudson1.er.usgs.gov:8080/hudson/job/geotiff-iosp/</url>
+	</ciManagement>
+	<distributionManagement>
+		<repository>
+			<id>cida-releases</id>
+			<name>CIDA Releases</name>
+			<url>http://internal.cida.usgs.gov/maven/content/repositories/cida-public-releases</url>
+		</repository>
+		<snapshotRepository>
+			<id>cida-snapshots</id>
+			<name>CIDA Snapshots</name>
+			<url>http://internal.cida.usgs.gov/maven/content/repositories/cida-public-snapshots/</url>
+		</snapshotRepository>
+	</distributionManagement>
+	<repositories>
+		<!-- for NetCDF -->
+		<repository>
+			<id>unidata-releases</id>
+			<url>https://artifacts.unidata.ucar.edu/content/repositories/unidata-releases</url>
+		</repository>
+		<repository>
+			<id>unidata-snapshots</id>
+			<url>https://artifacts.unidata.ucar.edu/content/repositories/unidata-snapshots</url>
+		</repository>
+		<!-- for ImageIO-EXT -->
+		<repository>
+			<id>geosolutions</id>
+			<url>http://maven.geo-solutions.it</url>
+		</repository>
+		<!-- for JAI and JAI ImageIO (latter is superceded by ImageIO-Ext) -->
+		<repository>
+			<id>opengeo</id>
+			<url>http://download.osgeo.org/webdav/geotools</url>
+		</repository>
+	</repositories>
 	<dependencyManagement>
 		<dependencies>
 			<dependency>
@@ -102,34 +106,34 @@
 				<scope>runtime</scope>
 			</dependency>
 			<dependency>
-                <groupId>net.java.dev.jsr-275</groupId>
-                <artifactId>jsr-275</artifactId>
-                <version>1.0-beta-2</version>
-			</dependency>
-<!-- bah, need former for consistency with GeoTools 2.7.x
-            <dependency>
-                <groupId>javax.measure</groupId>
+				<groupId>net.java.dev.jsr-275</groupId>
 				<artifactId>jsr-275</artifactId>
-				<version>0.9.3</version>
+				<version>1.0-beta-2</version>
 			</dependency>
--->
-<!--		
-			<dependency>
-				<groupId>org.geotools</groupId>
-				<artifactId>geotools</artifactId>
-				<version>${geotools.version}</version>
-				<type>pom</type>
-				<scope>import</scope>
-			</dependency>
-			<dependency>
-				<groupId>org.geotools</groupId>
-				<artifactId>gt-referencing</artifactId>
-			</dependency>
-			<dependency>
-				<groupId>org.geotools</groupId>
-				<artifactId>gt-epsg-hsql</artifactId>
-			</dependency>
--->
+			<!-- bah, need former for consistency with GeoTools 2.7.x
+						<dependency>
+							<groupId>javax.measure</groupId>
+							<artifactId>jsr-275</artifactId>
+							<version>0.9.3</version>
+						</dependency>
+			-->
+			<!--		
+						<dependency>
+							<groupId>org.geotools</groupId>
+							<artifactId>geotools</artifactId>
+							<version>${geotools.version}</version>
+							<type>pom</type>
+							<scope>import</scope>
+						</dependency>
+						<dependency>
+							<groupId>org.geotools</groupId>
+							<artifactId>gt-referencing</artifactId>
+						</dependency>
+						<dependency>
+							<groupId>org.geotools</groupId>
+							<artifactId>gt-epsg-hsql</artifactId>
+						</dependency>
+			-->
 		</dependencies>
 	</dependencyManagement>   
 	<build>
