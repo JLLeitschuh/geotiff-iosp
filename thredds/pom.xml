@@ -4,7 +4,7 @@
 	<parent>
 		<groupId>gov.usgs.cida.netcdf.iosp</groupId>
 		<artifactId>geotiff-iosp-parent</artifactId>
-		<version>1.3-SNAPSHOT</version>
+		<version>1.3</version>
 	</parent>
 	<artifactId>geotiff-iosp-thredds</artifactId>
 	<packaging>war</packaging>
