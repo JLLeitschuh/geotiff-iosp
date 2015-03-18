@@ -17,7 +17,7 @@
 	</modules>
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-		<thredds.version>4.5.3</thredds.version>
+		<thredds.version>4.5.5</thredds.version>
 		<!--<geotools.version>8.5</geotools.version>-->
 	</properties>
 	<scm>
