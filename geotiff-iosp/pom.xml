@@ -4,7 +4,7 @@
 	<parent>
 		<groupId>gov.usgs.cida.netcdf.iosp</groupId>
 		<artifactId>geotiff-iosp-parent</artifactId>
-		<version>1.6</version>
+		<version>1.7-SNAPSHOT</version>
 	</parent>
     <artifactId>geotiff-iosp</artifactId>
     <name>GeoTIFF IOSP</name>
